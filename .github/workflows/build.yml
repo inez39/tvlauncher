@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,3 +36,11 @@ jobs:
         with:
           name: tv-launcher-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publicar o APK para descarregar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk tv-launcher.apk
+          gh release delete tv-launcher-atual --yes --cleanup-tag || true
+          gh release create tv-launcher-atual tv-launcher.apk --title "Launcher da TV (mais recente)" --notes "Descarrega o ficheiro tv-launcher.apk e instala na TV."
